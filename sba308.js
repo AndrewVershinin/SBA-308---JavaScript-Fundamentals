@@ -92,14 +92,16 @@ function processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
             continue;
         }
 
-        const isLate = new Date(submitted_at) > new Date(assignment.due_at);
-
         // calls isValidSubmission to ensure the score is valid and the assignment points are positive.
         //id: learnerID: Sets the learner's ID.
         //totalScore: 0: Initializes the total score to 0. This will accumulate the learner’s scores from all valid submissions.
         //totalWeight: 0: Initializes the total weight to 0. This will accumulate the points possible from all assignments.
         //assignments: {}: Initializes an empty object to store scores for individual assignments.
-        if (isValidSubmission(submission, assignment)) {
+        if (!isValidSubmission(submission, assignment)) {
+            continue;
+        }
+
+        if (!learnerData.has(learnerID)) {
             learnerData.set(learnerID, {
                 id: learnerID,
                 totalScore: 0,
@@ -108,8 +110,27 @@ function processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
             });
         }
 
+        const learner = learnerData.get(learnerID); // a method call that get the value associated with the key learnerID from the learnerData map.
+        const pointsPossible = assignment.points_possible; // it represents the maximum number of points that a learner can earn for this assignment.
+        let scorePercentage = score / pointsPossible; // calculates the percentage score that the learner earned for the assignment.
+
+        // check if a submission was made after the assignment's due date. If the submission is late, it reduces the score by 10%.
+        if (new Date(submitted_at) > new Date(assignment.due_at)) {
+            console.warn(`Submission for assignment ID ${assignmentID} is late.`);
+            scorePercentage *= 0.9;
+        }
+
+        learner.assignments[assignmentID] = (scorePercentage * 100)
+        learner.totalScore += score;
+        learner.totalWeight += pointsPossible;
+
+        }
+
+        return {learnerData, assignmentScores}
         
     }
 
-}
+
+    let result = processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+    console.log(result)
 
