@@ -120,15 +120,15 @@ function processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
             scorePercentage *= 0.9;
         }
 
-        learner.assignments[assignmentID] = (scorePercentage * 100)
+        learner.assignments[assignmentID] = (scorePercentage * 100).toFixed(2);
         learner.totalScore += score;
         learner.totalWeight += pointsPossible;
 
-        }
-
-        return {learnerData, assignmentScores}
-        
     }
+
+    return {learnerData, assignmentScores};
+        
+}
 
 //getLearnerData processes learner submissions, calculates their scores, and formats the results into a structured format
 function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
@@ -151,8 +151,11 @@ function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
 
             results.push(learnerResult); // adds the learnerResult object to the results array, which collects all the formatted results.
 
-            return results;
+            
         });
+
+        return results;
+
     } catch (error) {
         console.error(error.message);
     }
