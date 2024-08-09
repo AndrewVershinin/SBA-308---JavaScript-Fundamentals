@@ -130,7 +130,34 @@ function processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
         
     }
 
+//getLearnerData processes learner submissions, calculates their scores, and formats the results into a structured format
+function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
+    try {
+        const {learnerData, assignmentScores} = processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
-    let result = processLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
-    console.log(result)
+        const results = [];
 
+        learnerData.forEach(learner => {
+            const weightedAvg = calculateAvgScore(learner); // takes the learner's total score and total weight and calculates their weighted average score.
+
+            const learnerResult = {
+                id: learner.id,
+                avg: weightedAvg.toFixed(3)
+            };
+        
+            for (const assignmentID in learner.assignments) {
+                learnerResult[assignmentID] = learner.assignments[assignmentID];
+            }
+
+            results.push(learnerResult); // adds the learnerResult object to the results array, which collects all the formatted results.
+
+            return results;
+        });
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+let result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+
+console.log(result);
